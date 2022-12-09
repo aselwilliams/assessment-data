@@ -229,5 +229,49 @@ module.exports = {
             console.log('DB seeded!')
             res.sendStatus(200)
         }).catch(err => console.log('error seeding DB', err))
+    },
+    getCountries: (req, res) => {
+        sequelize.query(`
+        SELECT * FROM countries;
+        `)
+        .then((dbRes) => {
+            res.status(200).send(dbRes[0])
+         }).catch(err => console.log(err))
+    },
+    createCity: (req, res)=> {
+        console.log(req.body)
+        let {name, rating, countryId} = req.body
+        sequelize.query(`
+            INSERT INTO cities(name, rating, country_id)
+            VALUES('${name}', ${rating}, ${countryId});
+        `)
+        .then(() => {
+            res.sendStatus(200)
+         })
+         .catch((err)=> console.log(err))
+    },
+    getCities: (req, res)=> {
+        sequelize.query(`
+            SELECT city.city_id, city.name AS city, city.rating, country.country_id, country.name AS country
+            FROM cities AS city
+            JOIN countries AS country
+            ON city.country_id = country.country_id;
+        `)
+        .then((dbRes) => {
+            res.status(200).send(dbRes[0])
+         })
+         .catch((err)=> console.log(err))
+    },
+    deleteCity: (req, res)=> {
+        let {id} = req.params
+        sequelize.query(`
+        DELETE FROM cities
+        WHERE city_id = ${id};
+        `)
+        .then((dbRes) => {
+            res.status(200).send(dbRes[0])
+         })
+         .catch(err=> console.log(err))
+
     }
 }
